@@ -38,4 +38,10 @@ public class TicketService {
     }
 
     public int count() { return tickets.size(); }
+
+    /** Filters by status, keeping the usual priority ordering. */
+    public List<Ticket> ticketsByStatus(Ticket.Status status) {
+        if (status == null) throw new IllegalArgumentException("Status is required");
+        return allByPriority().stream().filter(ticket -> ticket.getStatus() == status).toList();
+    }
 }
