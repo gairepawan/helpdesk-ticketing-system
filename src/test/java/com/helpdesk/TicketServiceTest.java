@@ -1,6 +1,7 @@
 package com.helpdesk;
 
 import org.junit.jupiter.api.Test;
+import java.util.List;
 import java.util.NoSuchElementException;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,5 +35,17 @@ class TicketServiceTest {
         TicketService service = new TicketService();
         assertThrows(IllegalArgumentException.class,
                 () -> service.create("  ", Ticket.Priority.LOW));
+    }
+
+    @Test void filtersTicketsByStatusInPriorityOrder() {
+        TicketService service = new TicketService();
+        Ticket low = service.create("Printer", Ticket.Priority.LOW);
+        Ticket high = service.create("Network", Ticket.Priority.HIGH);
+        service.create("Still new", Ticket.Priority.CRITICAL);
+        service.updateStatus(low.getId(), Ticket.Status.IN_PROGRESS);
+        service.updateStatus(high.getId(), Ticket.Status.IN_PROGRESS);
+        assertEquals(List.of(high.getId(), low.getId()), service.ticketsByStatus(Ticket.Status.IN_PROGRESS)
+                .stream().map(Ticket::getId).toList());
+        assertThrows(IllegalArgumentException.class, () -> service.ticketsByStatus(null));
     }
 }
